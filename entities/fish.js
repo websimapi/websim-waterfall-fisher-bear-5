@@ -29,6 +29,12 @@ export function createFish(scene, score = 0) {
         [0.1, 0.0,-0.45, 0.45, 0.15, 0.2, finMat], // pectoral R
     ];
     for (const [x,y,z,w,h,d,mat] of vox) group.add(createVoxel(x,y,z,w,h,d,mat));
+    // extra details
+    group.add(createVoxel(-0.85, 0.0, 0.0, 0.15, 0.15, 0.15, eyeMat)); // mouth tip
+    group.add(createVoxel(-0.35, 0.05, 0.0, 0.05, 0.35, 0.8, bellyMat)); // gill plate
+    group.add(createVoxel(0.95, 0.0,  0.25, 0.25, 0.35, 0.1, fishTailMat)); // tail fork top
+    group.add(createVoxel(0.95, 0.0, -0.25, 0.25, 0.35, 0.1, fishTailMat)); // tail fork bottom
+    group.add(createVoxel(0.1, -0.05, 0.0, 1.0, 0.08, 0.08, bellyMat)); // lateral stripe
     // orient fish to face downstream (+Z)
     group.rotation.y = Math.PI / 2;
     const riverWidth = 7;
@@ -54,7 +60,7 @@ export function updateFish(fish) {
     const ud = fish.userData;
     ud.swimTimer += 0.1;
     fish.position.x = ud.initialX + Math.sin(ud.swimTimer * ud.swimFrequency) * ud.swimAmplitude;
-    fish.rotation.y = ud.baseRotY + Math.sin(ud.swimTimer * ud.swimFrequency) * 0.2;
+    fish.rotation.y = ud.baseRotY + Math.sin(ud.swimTimer * ud.swimFrequency) * 0.12;
 }
 
 export function isFishPastLog(fish) {
