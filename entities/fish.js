@@ -48,18 +48,17 @@ export function createFish(scene, score = 0) {
     group.add(dorsal, anal, pectoralL, pectoralR, pelvicL, pelvicR);
     
     // head details: mouth, gill cover, eyes
-    group.add(createVoxel(0, 0.0, -0.7, 0.18, 0.18, 0.1, eyeMat)); // mouth
     group.add(createVoxel(0, 0.0, 0.25, 0.7, 0.6, 0.15, bellyMat)); // gill cover
-    const scleraL = createVoxel(0.28, 0.22, 0.05, 0.18, 0.18, 0.18, scleraMat);
-    const scleraR = createVoxel(-0.28, 0.22, 0.05, 0.18, 0.18, 0.18, scleraMat);
-    const pupilL  = createVoxel(0.30, 0.22, 0.12, 0.08, 0.08, 0.06, pupilMat);
-    const pupilR  = createVoxel(-0.30, 0.22, 0.12, 0.08, 0.08, 0.06, pupilMat);
-    const highlightL = createVoxel(0.34, 0.27, 0.15, 0.03, 0.03, 0.03, scleraMat);
-    const highlightR = createVoxel(-0.34, 0.27, 0.15, 0.03, 0.03, 0.03, scleraMat);
+    const scleraL = createVoxel(0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
+    const scleraR = createVoxel(-0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
+    const pupilL  = createVoxel(0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
+    const pupilR  = createVoxel(-0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
+    const highlightL = createVoxel(0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
+    const highlightR = createVoxel(-0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
     group.add(scleraL, scleraR, pupilL, pupilR, highlightL, highlightR);
     
-    // orient fish to face downstream (+Z)
-    group.rotation.y = 0;
+    // orient fish to face downstream (+Z), head leading
+    group.rotation.y = Math.PI;
     const riverWidth = 7;
     const xPos = (Math.random() - 0.5) * riverWidth;
     const baseY = 2.1;
