@@ -18,47 +18,48 @@ function createVoxel(x, y, z, w, h, d, mat) {
 export function createFish(scene, score = 0) {
     const group = new THREE.Group();
     group.name = 'fish';
-    const vox = [
-        [0.0, 0.0, 0.0, 1.8, 0.9, 0.7, fishMat],
-        [-0.9, 0.05, 0.0, 0.5, 0.95, 0.75, fishMat],
-        [-0.55, -0.2, 0.0, 0.8, 0.22, 0.55, bellyMat],
-    ];
-    for (const [x,y,z,w,h,d,mat] of vox) group.add(createVoxel(x,y,z,w,h,d,mat));
     
-    // tail assembly
-    const tailBase = createVoxel(0.95, 0.0, 0.0, 0.1, 0.8, 0.8, fishTailMat);
-    const tailV = createVoxel(1.05, 0.0, 0.0, 0.5, 0.7, 0.12, fishTailMat);
-    const tailH = createVoxel(1.05, 0.0, 0.0, 0.5, 0.12, 0.7, fishTailMat);
+    // body (tapered along +Z, nose forward)
+    const segments = 6, length = 3.0, maxW = 0.8, maxH = 0.9;
+    for (let i = 0; i < segments; i++) {
+        const t = i / (segments - 1);
+        const w = THREE.MathUtils.lerp(maxW, 0.35, t);
+        const h = THREE.MathUtils.lerp(maxH, 0.4, t);
+        const z = -0.4 + t * length;
+        group.add(createVoxel(0, 0, z, w, h, length / segments, fishMat));
+        const bellyH = h * 0.25;
+        group.add(createVoxel(0, -h * 0.3, z, w * 0.95, bellyH, (length / segments) * 0.98, bellyMat));
+    }
+    
+    // tail (vertical caudal fin + small stabilizer)
+    const tailZ = -0.4 + length + 0.15;
+    const tailBase = createVoxel(0, 0.0, tailZ - 0.1, 0.25, 0.6, 0.18, fishTailMat);
+    const tailV = createVoxel(0, 0.0, tailZ, 0.06, 0.9, 0.5, fishTailMat);
+    const tailH = createVoxel(0, -0.05, tailZ - 0.05, 0.5, 0.08, 0.35, fishTailMat);
     group.add(tailBase, tailV, tailH);
     
-    // fins (referenced for animation)
-    const dorsal = createVoxel(-0.1, 0.5, 0.0, 0.9, 0.22, 0.35, finMat);
-    const anal = createVoxel( 0.5,-0.45,0.0, 0.7, 0.2,  0.3, finMat);
-    group.add(dorsal, anal);
+    // fins
+    const dorsal = createVoxel(0, 0.55, 0.9, 0.1, 0.25, 0.9, finMat);
+    const anal   = createVoxel(0, -0.55, 1.1, 0.1, 0.22, 0.8, finMat);
+    const pectoralL = createVoxel(0.42, -0.05, 0.4, 0.06, 0.18, 0.35, finMat);
+    const pectoralR = createVoxel(-0.42, -0.05, 0.4, 0.06, 0.18, 0.35, finMat);
+    const pelvicL = createVoxel(0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
+    const pelvicR = createVoxel(-0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
+    group.add(dorsal, anal, pectoralL, pectoralR, pelvicL, pelvicR);
     
-    // extra details
-    group.add(createVoxel(-1.1, 0.0, 0.0, 0.12, 0.2, 0.2, eyeMat)); // mouth tip
-    group.add(createVoxel(-0.7, 0.05, 0.0, 0.12, 0.5, 0.9, bellyMat)); // gill cover
-    group.add(createVoxel(-0.55, -0.35,  0.22, 0.35, 0.14, 0.18, finMat)); // pelvic fin L (front bottom)
-    group.add(createVoxel(-0.55, -0.35, -0.22, 0.35, 0.14, 0.18, finMat)); // pelvic fin R
-    const pectoralL = createVoxel(-0.7, 0.0,  0.5, 0.4, 0.16, 0.2, finMat);
-    const pectoralR = createVoxel(-0.7, 0.0, -0.5, 0.4, 0.16, 0.2, finMat);
-    group.add(pectoralL, pectoralR);
-    
-    // detailed eyes (sclera + pupil + highlight + lid)
-    const eyeOffset = { x: -0.8, y: 0.28, z: 0.18 };
-    const scleraL = createVoxel(eyeOffset.x, eyeOffset.y, +eyeOffset.z, 0.16, 0.16, 0.16, scleraMat);
-    const scleraR = createVoxel(eyeOffset.x, eyeOffset.y, -eyeOffset.z, 0.16, 0.16, 0.16, scleraMat);
-    const pupilL  = createVoxel(eyeOffset.x-0.03, eyeOffset.y, +eyeOffset.z, 0.06, 0.06, 0.06, pupilMat);
-    const pupilR  = createVoxel(eyeOffset.x-0.03, eyeOffset.y, -eyeOffset.z, 0.06, 0.06, 0.06, pupilMat);
-    const highlightL = createVoxel(eyeOffset.x-0.05, eyeOffset.y+0.04, +eyeOffset.z+0.04, 0.03, 0.03, 0.03, scleraMat);
-    const highlightR = createVoxel(eyeOffset.x-0.05, eyeOffset.y+0.04, -eyeOffset.z-0.04, 0.03, 0.03, 0.03, scleraMat);
-    const eyelidTopL = createVoxel(eyeOffset.x, eyeOffset.y+0.11, +eyeOffset.z, 0.18, 0.05, 0.18, fishMat);
-    const eyelidTopR = createVoxel(eyeOffset.x, eyeOffset.y+0.11, -eyeOffset.z, 0.18, 0.05, 0.18, fishMat);
-    group.add(scleraL, scleraR, pupilL, pupilR, highlightL, highlightR, eyelidTopL, eyelidTopR);
+    // head details: mouth, gill cover, eyes
+    group.add(createVoxel(0, 0.0, -0.7, 0.18, 0.18, 0.1, eyeMat)); // mouth
+    group.add(createVoxel(0, 0.0, 0.25, 0.7, 0.6, 0.15, bellyMat)); // gill cover
+    const scleraL = createVoxel(0.28, 0.22, 0.05, 0.18, 0.18, 0.18, scleraMat);
+    const scleraR = createVoxel(-0.28, 0.22, 0.05, 0.18, 0.18, 0.18, scleraMat);
+    const pupilL  = createVoxel(0.30, 0.22, 0.12, 0.08, 0.08, 0.06, pupilMat);
+    const pupilR  = createVoxel(-0.30, 0.22, 0.12, 0.08, 0.08, 0.06, pupilMat);
+    const highlightL = createVoxel(0.34, 0.27, 0.15, 0.03, 0.03, 0.03, scleraMat);
+    const highlightR = createVoxel(-0.34, 0.27, 0.15, 0.03, 0.03, 0.03, scleraMat);
+    group.add(scleraL, scleraR, pupilL, pupilR, highlightL, highlightR);
     
     // orient fish to face downstream (+Z)
-    group.rotation.y = Math.PI / 2;
+    group.rotation.y = 0;
     const riverWidth = 7;
     const xPos = (Math.random() - 0.5) * riverWidth;
     const baseY = 2.1;
