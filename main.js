@@ -19,6 +19,7 @@ scene.add(waterfall);
 createLights(scene);
 
 let activeFish = null;
+let showcaseFish = null;
 
 // --- UI & STATE (refactored) ---
 const {
@@ -34,6 +35,7 @@ wireAudioUnlock(initAudio);
 
 function startGame() {
     gameState = { current: 'PLAYING', score: 0, streak: 1 };
+    if (showcaseFish) { scene.remove(showcaseFish); showcaseFish = null; }
     bear.position.set(0, 4, 4);
     bear.rotation.set(0, Math.PI, 0);
     updateUIValues({ score: gameState.score, streak: gameState.streak });
@@ -128,6 +130,15 @@ import { mountRenderer } from './scene.js';
 mountRenderer(document.getElementById('game-container'));
 window.addEventListener('resize', resizeRenderer);
 
+// create rotating showcase fish for title screen
+if (!showcaseFish) {
+    showcaseFish = createFish(scene, 0);
+    showcaseFish.name = 'showcase-fish';
+    showcaseFish.position.set(1.5, 2.3, -2);
+    showcaseFish.userData.velocity.set(0, 0, 0);
+    showcaseFish.userData.swimAmplitude = 0;
+}
+
 // --- GAME LOOP (trimmed) ---
 const gravity = new THREE.Vector3(0, -0.05, 0);
 
@@ -153,6 +164,9 @@ function animate() {
             bear.position.add(gravity);
             bear.rotation.z += 0.05;
         }
+    } else { // IDLE (title screen)
+        bear.rotation.y += 0.01;
+        if (showcaseFish) showcaseFish.rotation.y += 0.02;
     }
     renderer.render(scene, camera);
 }
